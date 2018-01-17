@@ -47,7 +47,11 @@
     			target.DataTable(config);
     			break;
 
-    		case 'json_var': 
+    		case 'field':
+    			curr_element.DataTable(config);
+    			break;
+
+    		case 'json_var':
     			config["data"] = window[curr_element.data('data_source_param')];
     			curr_element.DataTable(config);
     			break;
@@ -58,53 +62,36 @@
     			break;
 
     		case 'ajax_server': 
-    			config["ajax"] = curr_element.data('data_source_param');
-    			config["processing"] = true;
-    			config["serverSide"] = true;
+    			var ajax_url = curr_element.data('data_source_param');
+    			config.processing = true;
+    			config.serverSide = true;
 
-    			/*curr_element.DataTable({
-					ajax: {
-						url: function () {
-			      			return curr_element.data('datatable-url');
-			    		},
-						dataType: 'json',
-						data: function (params) {
-							var query = {
-								search: params.term,
-								page: params.page || 1,
-								per_page: curr_element.data('items-per-page')
-							};
+				config.ajax = function(params, callback, settings) {
+			        var request_params = {
+			        	offset: params.start,
+			        	per_page: params.length,
+			        	orderby: params.columns[params.order[0].column].data,
+			        	order: params.order[0].dir,
+			        };
 
-							return query;
-						},
-						transport: function (params, success, failure) {
-							var read_headers = function(data, textStatus, jqXHR) {
-						        var total_pages = parseInt(jqXHR.getResponseHeader('X-WP-TotalPages')) || 1;
-						        var display_field_name = curr_element.data('display-field-name');
+			        if (params.search.value != "") {
+			        	request_params.search = params.search.value;
+			        }
 
-						        var formatted_data = $.map(data, function (obj) {
-								  obj.text = resolve(display_field_name, obj);
+			        $.get(ajax_url, request_params, function(data, status, jqXHR) {
+			        	var total_records = parseInt(jqXHR.getResponseHeader('X-WP-Total'));
 
-								  return obj;
-								});
-
-						        return {
-						          	results: formatted_data,
-						          	pagination: {
-						            	more: params.data.page < total_pages
-						          	}
-						        };
-						    };
-
-			    			var $request = $.ajax(params);
-
-			    			$request.then(read_headers).then(success);
-						    $request.fail(failure);
-
-						    return $request;
-						}
-					}
-				});*/
+				        var result = {
+				        	recordsTotal: total_records,
+							recordsFiltered: total_records,
+				          	data: data,
+				        };
+			            
+			            callback(result);
+			        });
+			    };
+				
+				curr_element.DataTable(config);
     			break;
 
     		default:

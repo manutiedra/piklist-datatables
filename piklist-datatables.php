@@ -122,6 +122,7 @@ class Piklist_Datatables_Plugin {
 
 			// sets the default configuration options for non initialized entries
 			static $default_config = array(
+				'generate_footer' => null,			// generates the footer
 				'enable_paging' => null,			// enables or disables pagination
 				'enable_ordering' => null,			// enables or disables ordering of columns
 				'enable_search' => null,			// enables or disables search
@@ -140,7 +141,7 @@ class Piklist_Datatables_Plugin {
 				'page_sizes' => null,				// 1D array of integers with different page sizes. Use -1 for all. Use a 2D array for string translation
 				'group_by_column' => null,			// the column index to use for grouping (columns start at 0)
 
-				'data_source_type' => null,			// sets one of the data source types: dom, json_var, ajax_client, ajax_server, field
+				'data_source_type' => 'field',		// sets one of the data source types: dom, json_var, ajax_client, ajax_server, field
 				'data_source_param' => null,		// dom: an element selector, json_var: a variable name, ajax_client, ajax_server: an url
 
 				'language' => null,					// languaje file to be used for the different messages displayed (see lib\js\i18n for the names)
@@ -186,15 +187,13 @@ class Piklist_Datatables_Plugin {
 			// sets the default column options for non initialized entries
         	static $default_column = array(
 				'title' => null,					// the title to use for this column (required)
-				'field_name' => null,				// the field to use for this columns // data
-				'visible' => null,					// if the column will be visible	// visible
-				'sortable' => null,					// if we can sort by this column // orderable
-				'searchable' => null,				// if the search uses this column // searchable
+				'field_name' => null,				// the field to use for this columns
+				'visible' => null,					// if the column will be visible
+				'sortable' => null,					// if we can sort by this column
+				'searchable' => null,				// if the search uses this column
+				'width' => null,					// css value for the width
+				'type' => null,						// the field type in case you want more control in client-side processing mode
 				'is_meta' => null,					// specifies if the column is stored in the meta tables
-				// multiple values for a meta key
-				// width
-				// type
-				// render
 			);
 
 			/**
@@ -229,7 +228,7 @@ class Piklist_Datatables_Plugin {
 			$attributes =& $field['attributes'];
 			$datatable =& $field['datatable'];
 
-			if (isset($datatable['config']['data_source_type']) && ($datatable['config']['data_source_type'] == 'ajax_server')) {
+			if ($datatable['config']['data_source_type'] == 'ajax_server') {
 				if (!isset($datatable['config']['data_source_param'])) {
 					$query_url = '/wp/v2/';
 					$query_parameters = $datatable['query'];
@@ -263,12 +262,12 @@ class Piklist_Datatables_Plugin {
 				}
 			}
 
-			// if the height is smaller than the vertical scroll size, adjust the height
+			// if the height is smaller than the vertical scroll size, adjusts the height
 			if (isset($datatable['config']['scroll_y'])) {
 				$attributes['data-scroll-collapse'] = true;
 			}
 
-			// we set a default layout if we need to show the export buttons
+			// sets a default layout if we need to show the export buttons
 			if (isset($datatable['config']['show_export_buttons']) && $datatable['config']['show_export_buttons']) {
 				$datatable['config']['show_export_buttons'] = array('copy', 'csv', 'excel', 'print');
 
@@ -277,12 +276,41 @@ class Piklist_Datatables_Plugin {
 				}
 			}
 
-			// resolve the language plugin url if the language is set
+			// resolves the language plugin url if the language is set
 			if (isset($datatable['config']['language'])) {
 				$datatable['config']['language'] = plugins_url('lib/js/i18n/' . $datatable['config']['language'] . '.json', __FILE__);
 			}
 
 			array_push($attributes['class'], 'piklist-datatable');
+
+			// column mappings
+			static $column_mappings = array(
+				'field_name' => 'data',
+				'visible' => 'visible',
+				'sortable' => 'orderable',
+				'searchable' => 'searchable',
+				'width' => 'width',
+				'type' => 'type',
+			);
+
+			// save the values to configure the columns
+			$columns = array();
+			foreach ($datatable['columns'] as $col) {
+				$current_col = array();
+				foreach($column_mappings as $key => $val) {
+					if (isset($col[$key])) {
+						$current_col[$val] = $col[$key];
+					}
+				}
+
+				array_push($columns, $current_col ? $current_col : null);
+			}
+			$attributes['data-columns'] = json_encode($columns);
+
+			// in field mode, we pass the data as data-* attributes
+			if ($datatable['config']['data_source_type'] == 'field') {
+				$attributes['data-data'] = json_encode($datatable['table_data']);
+			}
 
 			// the current implementation uses datatables but that could change in the future,
 			// so we use friendly names for the configuration
@@ -309,7 +337,7 @@ class Piklist_Datatables_Plugin {
 				'language' => 'language-file',
 			);
 
-			// save the data values to configure the field
+			// saves the data values to configure the field
 			foreach($data_mappings as $key => $val) {
 				if (isset($datatable['config'][$key])) {
 					if (is_array($datatable['config'][$key])) {
