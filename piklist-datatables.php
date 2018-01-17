@@ -145,7 +145,17 @@ class Piklist_Datatables_Plugin {
 				'language' => null,					// languaje file name to be used for the different messages displayed
 			);
 
-			$field['datatable']['config'] = wp_parse_args($field['datatable']['config'], $default_config);
+			/**
+			* Filters the default config options
+			*
+			* @param array $default_config The default config parameters
+			* @param array $field The settings for the field
+			*
+			* @since 0.0.1
+			*/
+			$config_options = apply_filters('piklist_datatables_default_config_options', $default_config, $field);
+
+			$field['datatable']['config'] = wp_parse_args($field['datatable']['config'], $config_options);
 
 			/*
 			TODO: row group, language, columns, ajax_server
@@ -169,7 +179,17 @@ class Piklist_Datatables_Plugin {
 				'type' => null,						// type to query
 			);
 
-			$field['datatable']['query'] = wp_parse_args($field['datatable']['query'], $default_query);
+			/**
+			* Filters the default query options
+			*
+			* @param array $default_query The default query parameters
+			* @param array $field The settings for the field
+			*
+			* @since 0.0.1
+			*/
+			$query_options = apply_filters('piklist_datatables_default_query_options', $default_query, $field);
+
+			$field['datatable']['query'] = wp_parse_args($field['datatable']['query'], $query_options);
 
 			// sets the default column options for non initialized entries
         	static $default_column = array(
@@ -185,8 +205,18 @@ class Piklist_Datatables_Plugin {
 				// render
 			);
 
+			/**
+			* Filters the default column options
+			*
+			* @param array $default_column The default column parameters
+			* @param array $field The settings for the field
+			*
+			* @since 0.0.1
+			*/
+			$column_options = apply_filters('piklist_datatables_default_column_options', $default_column, $field);
+
 			foreach($field['datatable']['columns'] as $key => $column) {
-				$field['datatable']['columns'][$key] = wp_parse_args($field['datatable']['columns'][$key], $default_column);
+				$field['datatable']['columns'][$key] = wp_parse_args($field['datatable']['columns'][$key], $column_options);
 			}
 			
 			// $field['datatable']['table_data'] contains the table data if the table is not loaded using ajax
