@@ -28,14 +28,17 @@
     		autoWidth: false,
     	};
 
-    	/*
-    	if (curr_element.data('export-buttons')) {
-        	config.buttons = ['copy', 'csv', 'excel', 'print'];
+    	if (curr_element.data('group-by-column')) {
+        	config.rowGroup = {
+        		dataSrc: curr_element.data('group-by-column')
+    		};
+    	}
 
-        	if (!curr_element.data('dom')) {
-        		config.dom = 'Blfrtip';
-        	}
-    	}*/
+    	if (curr_element.data('language-file')) {
+        	config.language = {
+        		url: curr_element.data('language-file')
+    		};
+    	}
 
     	switch (curr_element.data('data_source_type')) {
     		case 'dom':

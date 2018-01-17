@@ -126,7 +126,7 @@ class Piklist_Datatables_Plugin {
 				'enable_ordering' => null,			// enables or disables ordering of columns
 				'enable_search' => null,			// enables or disables search
 				'show_info' => null,				// shows information about the table including information about filtered data
-				'order' => null,					// specifies the sorting order
+				'order' => null,					// specifies the sorting order. 2D array with column index and sort order (f.e. [[ 3, 'desc' ]])
 				'scroll_x' => null,					// allows scrolling in the x axis (boolean)
 				'scroll_y' => null,					// sets the height for scrolling in the y axis (size string)
 				'enable_responsive' => null,		// enables the responsive extension
@@ -138,11 +138,12 @@ class Piklist_Datatables_Plugin {
 				'paging_type' => null,				// numbers, simple, simple_numbers, full, full_numbers, first_last_numbers
 				'page_size' => null,				// the selected page size. If it is not set, it will be the first entry of the page_sizes property
 				'page_sizes' => null,				// 1D array of integers with different page sizes. Use -1 for all. Use a 2D array for string translation
+				'group_by_column' => null,			// the column index to use for grouping (columns start at 0)
 
 				'data_source_type' => null,			// sets one of the data source types: dom, json_var, ajax_client, ajax_server, field
 				'data_source_param' => null,		// dom: an element selector, json_var: a variable name, ajax_client, ajax_server: an url
 
-				'language' => null,					// languaje file name to be used for the different messages displayed
+				'language' => null,					// languaje file to be used for the different messages displayed (see lib\js\i18n for the names)
 			);
 
 			/**
@@ -157,15 +158,6 @@ class Piklist_Datatables_Plugin {
 
 			$field['datatable']['config'] = wp_parse_args($field['datatable']['config'], $config_options);
 
-			/*
-			TODO: row group, language, columns, ajax_server
-
-			$('#example').dataTable( {
-            "language": {
-                "url": "dataTables.german.lang"
-            }
-        } );
-        */
         	// sets the default query options for non initialized entries
         	static $default_query = array(
 				'order' => null,					// order sort attribute
@@ -199,7 +191,7 @@ class Piklist_Datatables_Plugin {
 				'sortable' => null,					// if we can sort by this column // orderable
 				'searchable' => null,				// if the search uses this column // searchable
 				'is_meta' => null,					// specifies if the column is stored in the meta tables
-				// multiple values
+				// multiple values for a meta key
 				// width
 				// type
 				// render
@@ -272,7 +264,7 @@ class Piklist_Datatables_Plugin {
 			}
 
 			// if the height is smaller than the vertical scroll size, adjust the height
-			if (!isset($datatable['config']['scroll_y'])) {
+			if (isset($datatable['config']['scroll_y'])) {
 				$attributes['data-scroll-collapse'] = true;
 			}
 
@@ -283,6 +275,11 @@ class Piklist_Datatables_Plugin {
 				if (!isset($datatable['config']['dom'])) {
 					$datatable['config']['dom'] = 'Blfrtip';
 				}
+			}
+
+			// resolve the language plugin url if the language is set
+			if (isset($datatable['config']['language'])) {
+				$datatable['config']['language'] = plugins_url('lib/js/i18n/' . $datatable['config']['language'] . '.json', __FILE__);
 			}
 
 			array_push($attributes['class'], 'piklist-datatable');
@@ -304,11 +301,12 @@ class Piklist_Datatables_Plugin {
 				'paging_type' => 'paging-type',
 				'page_size' => 'page-length',
 				'page_sizes' => 'length-menu',
+				'group_by_column' => 'group-by-column',
 
 				'data_source_type' => 'data_source_type',
 				'data_source_param' => 'data_source_param',
 
-				'language' => 'language',
+				'language' => 'language-file',
 			);
 
 			// save the data values to configure the field
