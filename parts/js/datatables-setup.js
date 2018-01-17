@@ -11,13 +11,31 @@
     }, obj || self)
   }
 
+  function setValue(obj, path, value) {
+    var i;
+    path = path.split('.');
+    for (i = 0; i < path.length - 1; i++)
+        obj = obj[path[i]];
+
+    obj[path[i]] = value;
+}
+
   $(document).ready(function() {
     $('.piklist-datatable').each(function() {
     	var curr_element = $(this);
 
     	var config = {
-    		"autoWidth": false,
+    		autoWidth: false,
     	};
+
+    	/*
+    	if (curr_element.data('export-buttons')) {
+        	config.buttons = ['copy', 'csv', 'excel', 'print'];
+
+        	if (!curr_element.data('dom')) {
+        		config.dom = 'Blfrtip';
+        	}
+    	}*/
 
     	switch (curr_element.data('data_source_type')) {
     		case 'dom':
