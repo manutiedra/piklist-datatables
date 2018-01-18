@@ -26,9 +26,9 @@
     		};
     	}*/
 
-    	switch (curr_element.data('data_source_type')) {
+    	switch (curr_element.data('data-source-type')) {
     		case 'dom':
-    			var target = $(curr_element.data('data_source_param'));
+    			var target = $(curr_element.data('data-source-param'));
     			target.data(curr_element.data());
     			table = target.DataTable(config);
     			curr_element = target;
@@ -39,17 +39,21 @@
     			break;
 
     		case 'json_var':
-    			config["data"] = window[curr_element.data('data_source_param')];
+    			config.data = window[curr_element.data('data-source-param')];
     			table = curr_element.DataTable(config);
     			break;
 
     		case 'ajax_client': 
-    			config["ajax"] = curr_element.data('data_source_param');
+    			config.ajax = {
+    				url: curr_element.data('data-source-param'),
+    				dataSrc: '',
+    			};
+
     			table = curr_element.DataTable(config);
     			break;
 
     		case 'ajax_server': 
-    			var ajax_url = curr_element.data('data_source_param');
+    			var ajax_url = curr_element.data('data-source-param');
     			config.processing = true;
     			config.serverSide = true;
 
@@ -82,7 +86,7 @@
     			break;
 
     		default:
-    			// TODO: alert user
+    			alert('Invalid data-source-type specified ({0}) for element ({1})'.format(curr_element.data('data-source-type'), curr_element.attr('id')));
     	}
 
     	// with ajax_server the buttons were not created if we put them in the configuration, so we create them here if needed

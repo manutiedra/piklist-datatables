@@ -133,9 +133,6 @@ class Piklist_Datatables_Plugin {
 				'enable_responsive' => null,		// enables the responsive extension
 				'fix_header' => null,				// fixes the header on the top of the screen while scrolling down the table
 				'show_export_buttons' => null,		// to show the different export buttons
-				'dom' => null,						// this is used to control the different position of the items: 
-													// l: length changing input control, f: search input, t: the table, i: information summary
-													// p: pagination control, r: processing display element, B: export buttons
 				'paging_type' => null,				// numbers, simple, simple_numbers, full, full_numbers, first_last_numbers
 				'page_size' => null,				// the selected page size. If it is not set, it will be the first entry of the page_sizes property
 				'page_sizes' => null,				// 1D array of integers with different page sizes. Use -1 for all. Use a 2D array for string translation
@@ -230,7 +227,7 @@ class Piklist_Datatables_Plugin {
 			$attributes =& $field['attributes'];
 			$datatable =& $field['datatable'];
 
-			if ($datatable['config']['data_source_type'] == 'ajax_server') {
+			if (($datatable['config']['data_source_type'] == 'ajax_server') || ($datatable['config']['data_source_type'] == 'ajax_client')) {
 				if (!isset($datatable['config']['data_source_param'])) {
 					$query_url = '/wp/v2/';
 					$query_parameters = $datatable['query'];
@@ -259,7 +256,7 @@ class Piklist_Datatables_Plugin {
 				*/
 				$query_parameters = apply_filters('piklist_datatables_rest_query_paramters', $query_parameters, $field);
 
-				if (!empty($query_parameters)) {
+				if (!empty(implode(null, $query_parameters))) {
 					$datatable['config']['data_source_param'] = $datatable['config']['data_source_param'] . '?' . http_build_query($query_parameters);
 				}
 			}
@@ -321,14 +318,13 @@ class Piklist_Datatables_Plugin {
 				'enable_responsive' => 'responsive',
 				'fix_header' => 'fixed-header',
 				'show_export_buttons' => 'show-export-buttons',
-				'dom' => 'dom',
 				'paging_type' => 'paging-type',
 				'page_size' => 'page-length',
 				'page_sizes' => 'length-menu',
 				'group_by_column' => 'group-by-column',
 
-				'data_source_type' => 'data_source_type',
-				'data_source_param' => 'data_source_param',
+				'data_source_type' => 'data-source-type',
+				'data_source_param' => 'data-source-param',
 
 				'language' => 'language-file',
 			);
