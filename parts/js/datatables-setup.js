@@ -5,21 +5,6 @@
 ;(function($, window, document, undefined) {
   'use strict';
 
-  function resolve(path, obj) {
-  	return path.split('.').reduce(function(prev, curr) {
-    	return prev ? prev[curr] : null
-    }, obj || self)
-  }
-
-  function setValue(obj, path, value) {
-    var i;
-    path = path.split('.');
-    for (i = 0; i < path.length - 1; i++)
-        obj = obj[path[i]];
-
-    obj[path[i]] = value;
-}
-
   $(document).ready(function() {
     $('.piklist-datatable').each(function() {
     	var curr_element = $(this);
@@ -98,7 +83,6 @@
 
     	}
 	});
-
   });
 
 })(jQuery, window, document);

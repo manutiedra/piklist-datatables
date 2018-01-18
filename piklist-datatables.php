@@ -140,6 +140,8 @@ class Piklist_Datatables_Plugin {
 				'page_size' => null,				// the selected page size. If it is not set, it will be the first entry of the page_sizes property
 				'page_sizes' => null,				// 1D array of integers with different page sizes. Use -1 for all. Use a 2D array for string translation
 				'group_by_column' => null,			// the column index to use for grouping (columns start at 0)
+				'style' => 'display',				// string with the style. Options are: cell-border, compact, hover, order-column, row-border, stripe
+													// display = stripe hover order-column row-border
 
 				'data_source_type' => 'field',		// sets one of the data source types: dom, json_var, ajax_client, ajax_server, field
 				'data_source_param' => null,		// dom: an element selector, json_var: a variable name, ajax_client, ajax_server: an url
@@ -272,7 +274,7 @@ class Piklist_Datatables_Plugin {
 				$datatable['config']['show_export_buttons'] = array('copy', 'csv', 'excel', 'print');
 
 				if (!isset($datatable['config']['dom'])) {
-					$datatable['config']['dom'] = 'Blfrtip';
+					//$datatable['config']['dom'] = 'Blfrtip';
 				}
 			}
 
@@ -282,6 +284,9 @@ class Piklist_Datatables_Plugin {
 			}
 
 			array_push($attributes['class'], 'piklist-datatable');
+			if (isset($datatable['config']['style'])) {
+				array_push($attributes['class'], $datatable['config']['style']);
+			}
 
 			// column mappings
 			static $column_mappings = array(
