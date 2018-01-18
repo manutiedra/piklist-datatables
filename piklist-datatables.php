@@ -269,15 +269,6 @@ class Piklist_Datatables_Plugin {
 				$attributes['data-scroll-collapse'] = true;
 			}
 
-			// sets a default layout if we need to show the export buttons
-			if (isset($datatable['config']['show_export_buttons']) && $datatable['config']['show_export_buttons']) {
-				$datatable['config']['show_export_buttons'] = array('copy', 'csv', 'excel', 'print');
-
-				if (!isset($datatable['config']['dom'])) {
-					//$datatable['config']['dom'] = 'Blfrtip';
-				}
-			}
-
 			// resolves the language plugin url if the language is set
 			if (isset($datatable['config']['language'])) {
 				$datatable['config']['language'] = plugins_url('lib/js/i18n/' . $datatable['config']['language'] . '.json', __FILE__);
@@ -329,7 +320,7 @@ class Piklist_Datatables_Plugin {
 				'scroll_y' => 'scroll-Y',
 				'enable_responsive' => 'responsive',
 				'fix_header' => 'fixed-header',
-				'show_export_buttons' => 'buttons',
+				'show_export_buttons' => 'show-export-buttons',
 				'dom' => 'dom',
 				'paging_type' => 'paging-type',
 				'page_size' => 'page-length',

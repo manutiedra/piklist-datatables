@@ -8,6 +8,7 @@
   $(document).ready(function() {
     $('.piklist-datatable').each(function() {
     	var curr_element = $(this);
+    	var table = null;
 
     	var config = {
     		autoWidth: false,
@@ -18,32 +19,33 @@
         		dataSrc: curr_element.data('group-by-column')
     		};
     	}
-
+    	/*
     	if (curr_element.data('language-file')) {
         	config.language = {
         		url: curr_element.data('language-file')
     		};
-    	}
+    	}*/
 
     	switch (curr_element.data('data_source_type')) {
     		case 'dom':
     			var target = $(curr_element.data('data_source_param'));
     			target.data(curr_element.data());
-    			target.DataTable(config);
+    			table = target.DataTable(config);
+    			curr_element = target;
     			break;
 
     		case 'field':
-    			curr_element.DataTable(config);
+    			table = curr_element.DataTable(config);
     			break;
 
     		case 'json_var':
     			config["data"] = window[curr_element.data('data_source_param')];
-    			curr_element.DataTable(config);
+    			table = curr_element.DataTable(config);
     			break;
 
     		case 'ajax_client': 
     			config["ajax"] = curr_element.data('data_source_param');
-    			curr_element.DataTable(config);
+    			table = curr_element.DataTable(config);
     			break;
 
     		case 'ajax_server': 
@@ -76,12 +78,21 @@
 			        });
 			    };
 				
-				curr_element.DataTable(config);
+				table = curr_element.DataTable(config);
     			break;
 
     		default:
-
+    			// TODO: alert user
     	}
+
+    	// with ajax_server the buttons were not created if we put them in the configuration, so we create them here if needed
+    	if (curr_element.data('show-export-buttons')) {
+	    	new $.fn.dataTable.Buttons(table, { buttons: ['copy', 'csv', 'excel', 'print'] });
+
+	    	var element_id = '#' + curr_element.attr('id') + '_length';
+	    	var button_container = table.buttons().container();
+	    	button_container.insertBefore(element_id);
+	    }
 	});
   });
 
