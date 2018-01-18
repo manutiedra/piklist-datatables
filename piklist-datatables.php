@@ -158,18 +158,9 @@ class Piklist_Datatables_Plugin {
 
 			$field['datatable']['config'] = wp_parse_args($field['datatable']['config'], $config_options);
 
-        	// sets the default query options for non initialized entries
-        	static $default_query = array(
-				'order' => null,					// order sort attribute
-				'orderby' => null,					// sort collection by object attribute
-				'include' => null,					// limit result set to specific IDs
-				'exclude' => null,					// ensure result set excludes specific IDs
-				'before' => null,					// limit response to posts/comments published before a given ISO8601 compliant date
-				'after' => null,					// limit response to posts/comments published after a given ISO8601 compliant date
-				'slug' => null,						// limit result set to users with one or more specific slugs
-				'status' => null,					// limit result set to posts assigned one or more statuses
-				'type' => null,						// type to query
-			);
+        	// sets the default query options for non initialized entries. The  most common ones supported by the REST API are:
+        	// order, orderby, include, exclude, before, after, slug, status, type. However, each type has its own particularities
+        	static $default_query = array();
 
 			/**
 			* Filters the default query options
@@ -209,7 +200,7 @@ class Piklist_Datatables_Plugin {
 				$field['datatable']['columns'][$key] = wp_parse_args($field['datatable']['columns'][$key], $column_options);
 			}
 			
-			// $field['datatable']['table_data'] contains the table data if the table is not loaded using ajax
+			// $field['datatable']['table_data'] contains the table data if we're in field mode
 		}
 		return $field;
 	}
@@ -286,7 +277,7 @@ class Piklist_Datatables_Plugin {
 				'type' => 'type',
 			);
 
-			// save the values to configure the columns
+			// saves the values to configure the columns
 			$columns = array();
 			foreach ($datatable['columns'] as $col) {
 				$current_col = array();
@@ -298,7 +289,9 @@ class Piklist_Datatables_Plugin {
 
 				array_push($columns, $current_col ? $current_col : null);
 			}
-			$attributes['data-columns'] = json_encode($columns);
+			if (!empty($columns)) {
+				$attributes['data-columns'] = json_encode($columns);
+			}
 
 			// in field mode, we pass the data as data-* attributes
 			if ($datatable['config']['data_source_type'] == 'field') {
