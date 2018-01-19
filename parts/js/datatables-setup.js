@@ -34,6 +34,16 @@
     		};
     	}
 
+        if (curr_element.data('the-columns')) {
+            config.columns = curr_element.data('the-columns');
+
+            for (var i = 0; i < config.columns.length; i++) {
+                if (config.columns[i].render) {
+                    config.columns[i].render = window[config.columns[i].render];
+                }
+            }
+        }
+
     	switch (curr_element.data('data-source-type')) {
     		case 'dom':
     			var target = $(curr_element.data('data-source-param'));
@@ -93,7 +103,7 @@
     			break;
 
     		default:
-    			alert('Invalid data-source-type specified ({0}) for element ({1})'.format(curr_element.data('data-source-type'), curr_element.attr('id')));
+    			alert('Invalid data-source-type specified ' + curr_element.data('data-source-type') + ' for element ' + curr_element.attr('id'));
     	}
 	});
   });

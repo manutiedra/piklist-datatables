@@ -5,7 +5,7 @@
 
 piklist-datatables is a wordpress plugin that uses [datatables](https://datatables.net) to add support for powerful tables.
 
-The supported features include paging, filtering, grouping, sorting, fixed headers, responsive, internationalization export data to the clipboard, CSV or Excel:
+The supported features include paging, filtering, grouping, sorting, fixed headers, responsive, internationalization, data export (clipboard, CSV or Excel):
 
 ![Example of piklist-datatables in action](https://raw.githubusercontent.com/manutiedra/piklist-datatables/master/piklist-datatables.jpg)
 

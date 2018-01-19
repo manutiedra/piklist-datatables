@@ -183,7 +183,7 @@ class Piklist_Datatables_Plugin {
 				'searchable' => null,				// if the search uses this column
 				'width' => null,					// css value for the width
 				'type' => null,						// the field type in case you want more control in client-side processing mode
-				'is_meta' => null,					// specifies if the column is stored in the meta tables
+				'render' => null,					// a javascript function to modify the data read from the data source
 			);
 
 			/**
@@ -275,6 +275,7 @@ class Piklist_Datatables_Plugin {
 				'searchable' => 'searchable',
 				'width' => 'width',
 				'type' => 'type',
+				'render' => 'render',
 			);
 
 			// saves the values to configure the columns
@@ -290,7 +291,7 @@ class Piklist_Datatables_Plugin {
 				array_push($columns, $current_col ? $current_col : null);
 			}
 			if (!empty($columns)) {
-				$attributes['data-columns'] = json_encode($columns);
+				$attributes['data-the-columns'] = json_encode($columns);
 			}
 
 			// in field mode, we pass the data as data-* attributes
@@ -339,4 +340,6 @@ class Piklist_Datatables_Plugin {
 
 // creates the one an only instance of this plugin
 new Piklist_Datatables_Plugin();
+
+include_once(plugin_dir_path( __FILE__ ) . 'includes/javascript-helpers.php');
 ?>
