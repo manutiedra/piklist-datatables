@@ -18,37 +18,38 @@ if (!defined('ABSPATH')) {
  * The Piklist Datatables Plugin class
  */
 class Piklist_Datatables_Plugin {
-	private static $_this;
+	private static $inst = null;
 
 	/**
-	 * Constructor
+	 * Returns the one and only instance of this class
 	 *
 	 * @since 0.0.1
 	 */
-	function __construct() {
-		if (!isset( self::$_this)) {
-			self::$_this = $this;
+	public static function Instance()
+    {
+        if (self::$inst === null) {
+			self::$inst = new self();
 
 			// piklist plugin check
-			add_action('init', array($this, 'check_for_piklist'));
+			add_action('init', array(self::$inst, 'check_for_piklist'));
 
 			// scripts/styles registration
-			add_filter('piklist_field_assets', array($this, 'field_assets'));
+			add_filter('piklist_field_assets', array(self::$inst, 'field_assets'));
 
 			// datatables behaviour
-			add_filter("piklist_request_field", array($this, 'request_field'));
-			add_filter("piklist_pre_render_field", array($this, 'pre_render_field'));
-		}
-	}
+			add_filter("piklist_request_field", array(self::$inst, 'request_field'));
+			add_filter("piklist_pre_render_field", array(self::$inst, 'pre_render_field'));
+        }
+
+        return self::$inst;
+    }
 
 	/**
-	 * Returns the only instance of this class
+	 * Private Constructor
 	 *
-	 * @return Piklist_Datatables_Plugin
 	 * @since 0.0.1
 	 */
-	static function this() {
-		return self::$_this;
+	private function __construct() {
 	}
 
 	/**
@@ -75,7 +76,7 @@ class Piklist_Datatables_Plugin {
 	 * @since 0.0.1
 	 */
 	function field_assets($field_assets) {
-		$field_assets['datatable'] = array('callback' => array($this, 'render_field_assets'));
+		$field_assets['datatable'] = array('callback' => array(self::$inst, 'render_field_assets'));
 
 		return $field_assets;
 	}
@@ -339,7 +340,7 @@ class Piklist_Datatables_Plugin {
 }
 
 // creates the one an only instance of this plugin
-new Piklist_Datatables_Plugin();
+Piklist_Datatables_Plugin::Instance();
 
 include_once(plugin_dir_path( __FILE__ ) . 'includes/javascript-helpers.php');
 ?>
