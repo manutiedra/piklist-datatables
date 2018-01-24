@@ -23,7 +23,7 @@ class Piklist_Datatables_Plugin {
 	/**
 	 * Returns the one and only instance of this class
 	 *
-	 * @since 0.0.1
+	 * @since 0.0.2
 	 */
 	public static function Instance()
     {
@@ -95,6 +95,13 @@ class Piklist_Datatables_Plugin {
 
 		wp_enqueue_script('piklist-datatables', plugins_url('lib/js/datatables.min.js', __FILE__), array('jquery'), false, true);
 		wp_enqueue_script('piklist-datatables-setup', plugins_url('parts/js/datatables-setup.js', __FILE__), array('piklist-datatables'), false, true);
+
+		/**
+		* Notifies that is time to add additional assets related to the datatables field
+		*
+		* @since 0.0.2
+		*/
+		do_action('piklist_datatables_field_assets');
 	}
 
 	/**
