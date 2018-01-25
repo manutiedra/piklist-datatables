@@ -24,7 +24,7 @@ piklist('field', array(
   'attributes' => array(
     'data-width' => '100%',
   ),
-  'datatable' => array(
+  'options' => array(
     'config' => array(
       'data_source_type' => 'dom',
       'data_source_param' => '#example',
@@ -44,7 +44,7 @@ piklist('field', array(
   'attributes' => array(
     'data-width' => '100%',
   ),
-  'datatable' => array(
+  'options' => array(
     'config' => array(
       'data_source_type' => 'field',
       'generate_footer' => true,
@@ -77,7 +77,7 @@ piklist('field', array(
   'attributes' => array(
     'data-width' => '100%',
   ),
-  'datatable' => array(
+  'options' => array(
     'config' => array(
       'data_source_type' => 'json_var',
       'data_source_param' => 'dataSet',
@@ -116,7 +116,7 @@ piklist('field', array(
   'attributes' => array(
     'data-width' => '100%',
   ),
-  'datatable' => array(
+  'options' => array(
     'config' => array(
       'data_source_type' => 'ajax_client',      
       'generate_footer' => true,
@@ -146,7 +146,7 @@ piklist('field', array(
   'attributes' => array(
     'data-width' => '100%',
   ),
-  'datatable' => array(
+  'options' => array(
     'config' => array(
       'data_source_type' => 'ajax_server',
       'generate_footer' => true,
@@ -170,4 +170,9 @@ piklist('field', array(
 The field adds the parameters offset, per_page, orderby, order, search to match the current table status, so there is no server side code to write as this parameters are supported by the REST API. 
 
 ## History:
+* 26/01/2018: v0.0.2 released. 
+    What's new? 
+      - Changed configuration options from field['datatable'] to field['options'].
+      - Added render property support in order to generate custom column data.
+
 * 19/01/2018: v0.0.1 released

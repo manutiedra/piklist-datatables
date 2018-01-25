@@ -2,7 +2,7 @@
 /*
 Plugin Name: Piklist Datatables
 Description: Adds datatable field to piklist, with and without ajax support
-Version: 0.0.1
+Version: 0.0.2
 Author: Manuel Abadía
 Plugin Type: Piklist
 Text Domain: piklist-datatables
@@ -113,18 +113,9 @@ class Piklist_Datatables_Plugin {
 	 */
 	function request_field($field) {
 		if ($field['type'] == 'datatable') {
-			if (!isset($field['datatable'])) {
-				$field['datatable'] = array(
-					'config' => array(),
-					'query' => array(),
-					'columns' => array(),
-					'table_data' => array(),
-				);
-			} else {
-				foreach(array('config', 'query', 'columns', 'table_data') as $section) {
-					if (!isset($field['datatable'][$section])) {
-						$field['datatable'][$section] = array();
-					}
+			foreach(array('config', 'query', 'columns', 'table_data') as $section) {
+				if (!isset($field['options'][$section])) {
+					$field['options'][$section] = array();
 				}
 			}
 
@@ -164,7 +155,7 @@ class Piklist_Datatables_Plugin {
 			*/
 			$config_options = apply_filters('piklist_datatables_default_config_options', $default_config, $field);
 
-			$field['datatable']['config'] = wp_parse_args($field['datatable']['config'], $config_options);
+			$field['options']['config'] = wp_parse_args($field['options']['config'], $config_options);
 
         	// sets the default query options for non initialized entries. The  most common ones supported by the REST API are:
         	// order, orderby, include, exclude, before, after, slug, status, type. However, each type has its own particularities
@@ -180,7 +171,7 @@ class Piklist_Datatables_Plugin {
 			*/
 			$query_options = apply_filters('piklist_datatables_default_query_options', $default_query, $field);
 
-			$field['datatable']['query'] = wp_parse_args($field['datatable']['query'], $query_options);
+			$field['options']['query'] = wp_parse_args($field['options']['query'], $query_options);
 
 			// sets the default column options for non initialized entries
         	static $default_column = array(
@@ -204,11 +195,11 @@ class Piklist_Datatables_Plugin {
 			*/
 			$column_options = apply_filters('piklist_datatables_default_column_options', $default_column, $field);
 
-			foreach($field['datatable']['columns'] as $key => $column) {
-				$field['datatable']['columns'][$key] = wp_parse_args($field['datatable']['columns'][$key], $column_options);
+			foreach($field['options']['columns'] as $key => $column) {
+				$field['options']['columns'][$key] = wp_parse_args($field['options']['columns'][$key], $column_options);
 			}
 			
-			// $field['datatable']['table_data'] contains the table data if we're in field mode
+			// $field['options']['table_data'] contains the table data if we're in field mode
 		}
 		return $field;
 	}
@@ -224,26 +215,26 @@ class Piklist_Datatables_Plugin {
 		if ($field['type'] == 'datatable') {
 
 			$attributes =& $field['attributes'];
-			$datatable =& $field['datatable'];
+			$options =& $field['options'];
 
-			if (($datatable['config']['data_source_type'] == 'ajax_server') || ($datatable['config']['data_source_type'] == 'ajax_client')) {
-				if (!isset($datatable['config']['data_source_param'])) {
+			if (($options['config']['data_source_type'] == 'ajax_server') || ($options['config']['data_source_type'] == 'ajax_client')) {
+				if (!isset($options['config']['data_source_param'])) {
 					$query_url = '/wp/v2/';
-					$query_parameters = $datatable['query'];
+					$query_parameters = $options['query'];
 
 					$query_entity = 'posts';
 
-					if (isset($datatable['query']['type'])) {
-						$query_entity = $datatable['query']['type'];
-						unset($datatable['query']['type']);
+					if (isset($options['query']['type'])) {
+						$query_entity = $options['query']['type'];
+						unset($options['query']['type']);
 					}
 
 					$query_url = $query_url . $query_entity;
 
-					$datatable['config']['data_source_param'] = get_home_url(null, '/wp-json') . $query_url;
+					$options['config']['data_source_param'] = get_home_url(null, '/wp-json') . $query_url;
 				}
 
-				$query_parameters = $datatable['query'];
+				$query_parameters = $options['query'];
 
 				/**
 				* Filters the parameters that will be passed to the REST request
@@ -256,23 +247,23 @@ class Piklist_Datatables_Plugin {
 				$query_parameters = apply_filters('piklist_datatables_rest_query_paramters', $query_parameters, $field);
 
 				if (!empty(implode(null, $query_parameters))) {
-					$datatable['config']['data_source_param'] = $datatable['config']['data_source_param'] . '?' . http_build_query($query_parameters);
+					$options['config']['data_source_param'] = $options['config']['data_source_param'] . '?' . http_build_query($query_parameters);
 				}
 			}
 
 			// if the height is smaller than the vertical scroll size, adjusts the height
-			if (isset($datatable['config']['scroll_y'])) {
+			if (isset($options['config']['scroll_y'])) {
 				$attributes['data-scroll-collapse'] = true;
 			}
 
 			// resolves the language plugin url if the language is set
-			if (isset($datatable['config']['language'])) {
-				$datatable['config']['language'] = plugins_url('lib/js/i18n/' . $datatable['config']['language'] . '.json', __FILE__);
+			if (isset($options['config']['language'])) {
+				$options['config']['language'] = plugins_url('lib/js/i18n/' . $options['config']['language'] . '.json', __FILE__);
 			}
 
 			array_push($attributes['class'], 'piklist-datatable');
-			if (isset($datatable['config']['style'])) {
-				array_push($attributes['class'], $datatable['config']['style']);
+			if (isset($options['config']['style'])) {
+				array_push($attributes['class'], $options['config']['style']);
 			}
 
 			// column mappings
@@ -288,7 +279,7 @@ class Piklist_Datatables_Plugin {
 
 			// saves the values to configure the columns
 			$columns = array();
-			foreach ($datatable['columns'] as $col) {
+			foreach ($options['columns'] as $col) {
 				$current_col = array();
 				foreach($column_mappings as $key => $val) {
 					if (isset($col[$key])) {
@@ -303,8 +294,8 @@ class Piklist_Datatables_Plugin {
 			}
 
 			// in field mode, we pass the data as data-* attributes
-			if ($datatable['config']['data_source_type'] == 'field') {
-				$attributes['data-data'] = json_encode($datatable['table_data']);
+			if ($options['config']['data_source_type'] == 'field') {
+				$attributes['data-data'] = json_encode($options['table_data']);
 			}
 
 			// the current implementation uses datatables but that could change in the future,
@@ -333,11 +324,11 @@ class Piklist_Datatables_Plugin {
 
 			// saves the data values to configure the field
 			foreach($data_mappings as $key => $val) {
-				if (isset($datatable['config'][$key])) {
-					if (is_array($datatable['config'][$key])) {
-						$attributes['data-' . $val] = json_encode($datatable['config'][$key]);
+				if (isset($options['config'][$key])) {
+					if (is_array($options['config'][$key])) {
+						$attributes['data-' . $val] = json_encode($options['config'][$key]);
 					} else {
-						$attributes['data-' . $val] = $datatable['config'][$key];
+						$attributes['data-' . $val] = $options['config'][$key];
 					}
 				}
 			}
