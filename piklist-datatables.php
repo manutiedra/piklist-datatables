@@ -171,6 +171,11 @@ class Piklist_Datatables_Plugin {
 			*/
 			$query_options = apply_filters('piklist_datatables_default_query_options', $default_query, $field);
 
+			// sets the authetification nonce to be able to access the user id in the rest requests
+			if (!isset($query_options['_wpnonce'])) {
+				$query_options['_wpnonce'] = wp_create_nonce('wp_rest');
+			}
+
 			$field['options']['query'] = wp_parse_args($field['options']['query'], $query_options);
 
 			// sets the default column options for non initialized entries
