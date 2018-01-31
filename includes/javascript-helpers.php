@@ -84,6 +84,37 @@ class PD_JS_Helpers {
 	}
 
 	/**
+	 * Generates a string from an array of values
+	 *
+	 * @param string $function_name The client side function name to generate
+	 * @param string $field_name The row field entry with the array of values
+	 * @return void
+	 * @since 0.0.1
+	 */
+	static function explode_values($function_name, $field_name) {
+?>
+<script type="text/javascript">
+    function <?php echo $function_name; ?>(data,type,row,meta)
+    {
+        var result = [];
+
+        if (row.<?php echo $field_name; ?>) {
+        	if (Array.isArray(row.<?php echo $field_name; ?>)) {
+	            for (var i = 0; i < row.<?php echo $field_name; ?>.length; i++) {
+	                if (row.<?php echo $field_name; ?>[i]) {
+                        result.push(row.<?php echo $field_name; ?>[i]);
+	                }
+	            }
+	        }
+        }
+
+        return result.join(', ');
+    }
+</script>
+<?php
+	}
+
+	/**
 	 * Gets the backend url to edit a post entry
 	 *
 	 * @return string  the edit url
